@@ -10,14 +10,14 @@ cd(filedir);
 L_cells = struct([]);
 Cad_im2 = struct([]);
 %cc_cells = struct([]);
-se90I = strel('line', 5, 90);
-se0I = strel('line', 5, 0);
+se90I = strel('line', 7, 90);
+se0I = strel('line', 7, 0);
 
 tif8_dir =[filedir, '/8bit']; 
 tif16_dir =[filedir, '/16bit']; 
 %Folder to save information about cells
 mkdir(filedir, 'Cells');
-cells_dir = [filedir, 'Cells'];
+cells_dir = [filedir, '/Cells'];
 
 cd(tif16_dir);
 files_tif = dir('*.tif');
@@ -57,7 +57,7 @@ L_new{1} = L_cells{1};
 for g=2:numel(files_tif)
     L_new{g} = zeros(size(L_cells{1},1),size(L_cells{1},2));
     for i=1:max(max(L_cells{1}))
-        number(i,g) = round(sum(L_cells{g}(L_new{g-1}==i))/length(L_cells{g}(L_new{g-1}==i)));
+        number(i,g) = mode(L_cells{g}(L_new{g-1}==i));
         L_new{g}(L_cells{g}==number(i,g)) = i;
     end    
 end
@@ -70,15 +70,9 @@ for l=1:size(number,1)
     end
 end
 
-X = struct()
-for g=1:numel(files_tif)
-    cc_cells = bwconncomp(L_new{g});
-    s_cells = regionprops(cc_cells, Cad_im2{g},'PixelList','PixelValues','Centroid');
-    for i=1: size(number,1)
-        centre = repmat([Center(i,1); Center(i,2)], 1, length(s_cells.PixelList))';
-    end
-end
+registering;
 
+cd(currdir);
 %% Matching cells
 
 %     Cad_new = zeros(size(Cad_im2,1), size(Cad_im2,1));
